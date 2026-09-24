@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { Calendar, Clock, Users, Sparkles, Target, Lightbulb, X, Hand, Heart, Trash2, ChevronLeft, ChevronRight, Search, ChevronUp, ChevronDown, ChevronsUpDown, Monitor, Wrench, Globe, Shield, Hotel, Scissors, BookOpen, Shirt } from 'lucide-react';
+import PageHeader from './PageHeader';
 
 export default function ProgramJadwal() {
   const navigate = useNavigate();
-  const [selectedInterest, setSelectedInterest] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
 
   type JadwalKey = 'program' | 'pendaftaran' | 'seleksi' | 'pengumuman' | 'daftarUlang' | 'pelatihan' | 'uji' | 'kuota';
@@ -20,11 +20,6 @@ export default function ProgramJadwal() {
       ? <ChevronUp className="w-3 h-3 text-blue-600 inline ml-1" />
       : <ChevronDown className="w-3 h-3 text-blue-600 inline ml-1" />;
   };
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-
   const programsScrollRef = useRef<HTMLDivElement>(null);
   const isProgramsDragging = useRef(false);
   const programsStartX = useRef(0);
@@ -50,24 +45,6 @@ export default function ProgramJadwal() {
     onMouseUp: () => { dragging.current = false; },
     onMouseLeave: () => { dragging.current = false; },
   });
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
-    scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current || !scrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX.current) * 1.2;
-    scrollRef.current.scrollLeft = scrollLeft.current - walk;
-  };
-
-  const stopDragging = () => {
-    isDragging.current = false;
-  };
 
   const programsDragHandlers = useDragScroll(
     programsScrollRef,
@@ -112,19 +89,6 @@ export default function ProgramJadwal() {
   const removeFromSaved = (name: string) => {
     setSavedPrograms(prev => prev.filter(n => n !== name));
   };
-
-  const interests: { id: string; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-    { id: 'teknologi', label: 'Teknologi & Digital', Icon: Monitor },
-    { id: 'kuliner', label: 'Kuliner & F&B', Icon: Sparkles },
-    { id: 'kreatif', label: 'Kreatif & Desain', Icon: Target },
-    { id: 'teknik', label: 'Teknik & Mesin', Icon: Wrench },
-    { id: 'hospitality', label: 'Hospitality', Icon: Hotel },
-    { id: 'kecantikan', label: 'Kecantikan & Spa', Icon: Scissors },
-    { id: 'bahasa', label: 'Bahasa & Komunikasi', Icon: Globe },
-    { id: 'bisnis', label: 'Bisnis & Administrasi', Icon: BookOpen },
-    { id: 'fashion', label: 'Mode & Busana', Icon: Shirt },
-    { id: 'keamanan', label: 'Keamanan', Icon: Shield },
-  ];
 
   type Program = {
     name: string; durasi: string; jadwal: string; kuota: number; terisi: number;
@@ -422,11 +386,6 @@ export default function ProgramJadwal() {
     },
   ];
 
-  const getRecommendedPrograms = () => {
-    if (!selectedInterest) return [];
-    return programs.filter(p => p.kategori === selectedInterest);
-  };
-
   const filteredPrograms = searchQuery.trim()
     ? programs.filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -434,8 +393,6 @@ export default function ProgramJadwal() {
         p.durasi.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : programs;
-
-  const recommendedPrograms = getRecommendedPrograms();
 
   // Calendar state
   const today = new Date();
@@ -515,91 +472,13 @@ export default function ProgramJadwal() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Pelatihan' }, { label: 'Program & Jadwal' }]}
+        title="Program & Jadwal"
+        subtitle="Temukan program pelatihan yang sesuai dengan minat dan kebutuhan Anda"
+      />
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-          {/* Recommendation Section */}
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-8 mb-10">
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Rekomendasi Pelatihan Untukmu</h2>
-            </div>
-
-            {/* Interest Selection — horizontally draggable */}
-            <div
-              ref={scrollRef}
-              className="flex gap-4 mb-6 overflow-x-auto pb-2 select-none cursor-grab active:cursor-grabbing"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={stopDragging}
-              onMouseLeave={stopDragging}
-            >
-              {interests.map((interest) => (
-                <button
-                  key={interest.id}
-                  onClick={() => setSelectedInterest(interest.id)}
-                  className={`flex-shrink-0 w-40 p-4 rounded-xl border-2 transition-all text-left ${
-                    selectedInterest === interest.id
-                      ? 'border-purple-600 bg-purple-100 shadow-md'
-                      : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-sm'
-                  }`}
-                >
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mb-2 shadow-sm">
-                    <interest.Icon className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div className="text-sm font-medium text-gray-900">{interest.label}</div>
-                </button>
-              ))}
-            </div>
-
-            {/* Recommendation Results */}
-            {selectedInterest && recommendedPrograms.length > 0 && (
-              <div className="bg-white rounded-lg p-6 border-2 border-purple-300">
-                <div className="flex items-center gap-2 mb-4">
-                  <Target className="w-6 h-6 text-purple-600" />
-                  <h3 className="text-lg font-bold text-gray-900">
-                    Rekomendasi Program untuk {interests.find(i => i.id === selectedInterest)?.label}
-                  </h3>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {recommendedPrograms.map((program, index) => (
-                    <div key={index} className="flex items-start gap-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                      <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-gray-900 mb-1">{program.name}</h4>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <p>Durasi: {program.durasi}</p>
-                          <p>Level: {program.difficulty}</p>
-                          <p>Prospek Kerja: {program.jobProspect}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 flex items-start gap-2 text-sm text-purple-700 bg-purple-100 p-3 rounded-lg">
-                  <Lightbulb className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <p>
-                    <span className="font-bold">Tips:</span> Program-program ini cocok dengan minat yang kamu pilih. Scroll ke bawah untuk lihat detail lengkapnya!
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {selectedInterest && recommendedPrograms.length === 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-                <p className="text-gray-700">Program untuk kategori ini sedang dalam pengembangan. Silakan pilih kategori lain!</p>
-              </div>
-            )}
-
-            {!selectedInterest && (
-              <div className="text-center text-gray-500 py-4">
-                <Lightbulb className="w-12 h-12 mx-auto mb-2 text-purple-400" />
-                <p>Pilih salah satu kategori di atas untuk mendapatkan rekomendasi!</p>
-              </div>
-            )}
-          </div>
 
           {/* All Programs */}
           <div className="mb-4">
@@ -642,15 +521,12 @@ export default function ProgramJadwal() {
               </div>
             ) : null}
             {(searchQuery ? filteredPrograms : showAll ? filteredPrograms : filteredPrograms.slice(0, 8)).map((program, index) => {
-              const isRecommended = recommendedPrograms.some(rp => rp.name === program.name);
               const isSaved = savedPrograms.includes(program.name);
 
               return (
                 <div
                   key={index}
-                  className={`flex flex-col bg-white rounded-xl shadow-md p-5 hover:shadow-xl transition-all relative ${
-                    isRecommended ? 'ring-2 ring-purple-500' : ''
-                  } ${isSaved ? 'ring-2 ring-blue-400' : ''}`}
+                  className={`flex flex-col bg-white rounded-xl shadow-md p-5 hover:shadow-xl transition-all relative ${isSaved ? 'ring-2 ring-blue-400' : ''}`}
                 >
                   {/* Drag handle — hand icon */}
                   <div
@@ -665,12 +541,6 @@ export default function ProgramJadwal() {
                     <Hand className="w-5 h-5" />
                   </div>
 
-                  {isRecommended && !isSaved && (
-                    <div className="absolute -top-3 -right-3 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                      <Sparkles className="w-3 h-3" />
-                      Rekomendasi
-                    </div>
-                  )}
                   <h3 className="text-base font-bold text-gray-900 mb-3 pr-6 leading-snug">{program.name}</h3>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 text-gray-600">
@@ -953,27 +823,27 @@ export default function ProgramJadwal() {
           </div>
 
           {/* Info Tambahan */}
-          <div className="bg-blue-50 rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Informasi Penting</h2>
-            <ul className="space-y-3 text-gray-700">
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
+          <div className="bg-blue-50 rounded-xl px-6 py-4">
+            <h2 className="text-xl mb-2 font-bold text-gray-900 mb-4">Informasi Penting</h2>
+            <ul className="space-y-1 text-sm text-gray-700">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600">•</span>
                 <span>Jadwal dapat berubah sewaktu-waktu sesuai kebijakan lembaga</span>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600">•</span>
                 <span>Pendaftaran dibuka setiap bulan dengan kuota terbatas - daftar sekarang agar tidak kehabisan!</span>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600">•</span>
                 <span>Peserta wajib hadir minimal 80% dari total pertemuan untuk mendapatkan sertifikat</span>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600">•</span>
                 <span>Sertifikat akan diberikan setelah menyelesaikan seluruh program pelatihan dan lulus ujian</span>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600">•</span>
                 <span>Gratis! Semua program pelatihan tidak dipungut biaya apapun</span>
               </li>
             </ul>

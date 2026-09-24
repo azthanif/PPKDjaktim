@@ -17,6 +17,7 @@ import OnlineTest from './components/OnlineTest';
 import DataPelatihan from './components/DataPelatihan';
 import DataAlumni from './components/DataAlumni';
 import DataPerusahaan from './components/DataPerusahaan';
+import Berita from './components/Berita';
 import ProfilPengguna from './components/ProfilPengguna';
 import FormPendaftaran from './components/FormPendaftaran';
 import KelasSaya from './components/KelasSaya';
@@ -82,9 +83,8 @@ function Layout({ children }: { children: React.ReactNode }) {
     const path = location.pathname;
     if (path === '/') return 'Beranda';
     if (path.includes('/tentang-kami') || path.includes('/visi-misi') || path.includes('/struktur-organisasi') || path.includes('/profil-lembaga')) return 'Profil Lembaga';
-    if (path.includes('/pendaftaran') || path.includes('/program-jadwal')) return 'Pelatihan';
-    if (path.includes('/online-test')) return 'Online Test';
-    if (path.includes('/data-pelatihan') || path.includes('/data-alumni') || path.includes('/data-perusahaan')) return 'Pusat Data';
+    if (path.includes('/pendaftaran') || path.includes('/program-jadwal') || path.includes('/online-test')) return 'Pelatihan';
+    if (path.includes('/data-pelatihan') || path.includes('/data-alumni') || path.includes('/data-perusahaan') || path.includes('/berita')) return 'Pusat Informasi';
     return 'Beranda';
   };
 
@@ -164,21 +164,17 @@ function Layout({ children }: { children: React.ReactNode }) {
                       >
                         Program dan Jadwal Pelatihan
                       </Link>
+                      <Link
+                        to="/online-test"
+                        className="block px-5 py-3 text-base text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setPelatihanDropdownOpen(false)}
+                      >
+                        Online Test
+                      </Link>
                     </div>
                   </div>
                 )}
               </div>
-
-              <Link
-                to="/online-test"
-                className={`px-4 py-2 rounded-md text-base transition-all ${
-                  activeMenu === 'Online Test'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                Online Test
-              </Link>
 
               <div
                 className="relative"
@@ -187,12 +183,12 @@ function Layout({ children }: { children: React.ReactNode }) {
               >
                 <button
                   className={`px-4 py-2 rounded-md text-base transition-all flex items-center gap-1 ${
-                    activeMenu === 'Pusat Data'
+                    activeMenu === 'Pusat Informasi'
                       ? 'bg-blue-600 text-white'
                       : 'text-blue-600 hover:bg-blue-50'
                   }`}
                 >
-                  Pusat Data
+                  Pusat Informasi
                   <ChevronDown className="w-4 h-4" />
                 </button>
 
@@ -219,6 +215,14 @@ function Layout({ children }: { children: React.ReactNode }) {
                         onClick={() => setPusatDataDropdownOpen(false)}
                       >
                         Data Perusahaan
+                      </Link>
+                      <div className="border-t border-gray-100 my-1" />
+                      <Link
+                        to="/berita"
+                        className="block px-5 py-3 text-base text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setPusatDataDropdownOpen(false)}
+                      >
+                        Berita
                       </Link>
                     </div>
                   </div>
@@ -432,7 +436,21 @@ function Layout({ children }: { children: React.ReactNode }) {
                   <div className={`mt-4 rounded-xl px-4 py-3 text-sm ${
                     activeStep === 2 ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'
                   }`}>
-                    {steps[activeStep]?.desc}
+                    {activeStep === 2 ? (
+                      <span>
+                        Selamat! Pendaftaran Anda telah disetujui, silakan lakukan online test terlebih dahulu yang berada di menu{' '}
+                        <Link
+                          to="/online-test"
+                          onClick={() => setShowStatusModal(false)}
+                          className="font-bold underline hover:opacity-80"
+                        >
+                          Online Test
+                        </Link>
+                        .
+                      </span>
+                    ) : (
+                      steps[activeStep]?.desc
+                    )}
                   </div>
                 </>
               ) : (
@@ -487,6 +505,8 @@ function AppRoutes() {
         <Route path="/data-pelatihan" element={<DataPelatihan />} />
         <Route path="/data-alumni" element={<DataAlumni />} />
         <Route path="/data-perusahaan" element={<DataPerusahaan />} />
+        <Route path="/berita" element={<Berita />} />
+        <Route path="/berita/:id" element={<Berita />} />
         <Route path="/profil" element={<ProfilPengguna />} />
         <Route path="/kelas-saya" element={<KelasSaya />} />
       </Routes>

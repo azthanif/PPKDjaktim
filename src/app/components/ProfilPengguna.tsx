@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { User, Mail, Phone, MapPin, Trash2, LogOut, ShieldAlert, X, ArrowLeft, Pencil, Check, ClipboardList, FileText, Clock, CheckCircle } from 'lucide-react';
+import PageHeader from './PageHeader';
 import { useAuth } from '../context/AuthContext';
 
 interface Registration {
@@ -123,6 +124,11 @@ export default function ProfilPengguna() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Beranda' }, { label: 'Profil Pengguna' }]}
+        title="Profil Saya"
+        subtitle="Kelola informasi akun dan data diri Anda"
+      />
       <section className="py-12">
         <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 space-y-6">
           <button
@@ -285,7 +291,6 @@ export default function ProfilPengguna() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-700">Keluar dari Akun</p>
-                  <p className="text-xs text-gray-400">Anda akan diarahkan ke beranda</p>
                 </div>
               </button>
               <button

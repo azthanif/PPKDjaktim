@@ -1,9 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { FileText, Clock, CheckCircle, AlertCircle, ChevronLeft, ChevronRight, Home, Trophy, XCircle, ChevronRight as Arrow, Smartphone, BarChart2, Monitor, Coffee, ChefHat, UtensilsCrossed, Leaf, Palette, PenTool, Camera, Film } from 'lucide-react';
+import { FileText, Clock, CheckCircle, AlertCircle, ChevronLeft, ChevronRight, Home, Trophy, XCircle, ChevronRight as Arrow, Smartphone, BarChart2, Monitor, Coffee, ChefHat, UtensilsCrossed, Leaf, Palette, PenTool, Camera, Film, Globe, Shield, Wrench, Zap, Hotel, Sparkles, Heart, Scissors, BookOpen, Shirt } from 'lucide-react';
+import PageHeader from './PageHeader';
 import { useAuth } from '../context/AuthContext';
 
-type Kategori = 'Semua' | 'Teknologi & Digital' | 'Kuliner & F&B' | 'Kreatif & Desain';
+type Kategori =
+  | 'Semua'
+  | 'Teknologi & Digital'
+  | 'Kuliner & F&B'
+  | 'Kreatif & Desain'
+  | 'Teknik & Mesin'
+  | 'Hospitality'
+  | 'Kecantikan & Spa'
+  | 'Bahasa & Komunikasi'
+  | 'Bisnis & Administrasi'
+  | 'Mode & Busana'
+  | 'Keamanan';
 
 interface Program {
   nama: string;
@@ -16,26 +28,71 @@ interface Program {
 }
 
 const PROGRAMS: Program[] = [
-  { nama: 'Digital Marketing', kategori: 'Teknologi & Digital', durasi: '3 Bulan', difficulty: 'Pemula', Icon: Smartphone, iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-  { nama: 'Data Analysis', kategori: 'Teknologi & Digital', durasi: '3 Bulan', difficulty: 'Menengah', Icon: BarChart2, iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-  { nama: 'Web Development', kategori: 'Teknologi & Digital', durasi: '4 Bulan', difficulty: 'Menengah', Icon: Monitor, iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-  { nama: 'Barista', kategori: 'Kuliner & F&B', durasi: '2 Bulan', difficulty: 'Pemula', Icon: Coffee, iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
-  { nama: 'Pastry & Bakery', kategori: 'Kuliner & F&B', durasi: '2 Bulan', difficulty: 'Pemula', Icon: ChefHat, iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
-  { nama: 'Tata Boga', kategori: 'Kuliner & F&B', durasi: '3 Bulan', difficulty: 'Pemula', Icon: UtensilsCrossed, iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
-  { nama: 'Pengolahan Makanan Sehat', kategori: 'Kuliner & F&B', durasi: '2 Bulan', difficulty: 'Pemula', Icon: Leaf, iconBg: 'bg-green-100', iconColor: 'text-green-600' },
-  { nama: 'Desain UI/UX', kategori: 'Kreatif & Desain', durasi: '3 Bulan', difficulty: 'Menengah', Icon: Palette, iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
-  { nama: 'Desain Grafis', kategori: 'Kreatif & Desain', durasi: '3 Bulan', difficulty: 'Pemula', Icon: PenTool, iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
-  { nama: 'Fotografi & Videografi', kategori: 'Kreatif & Desain', durasi: '3 Bulan', difficulty: 'Pemula', Icon: Camera, iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
-  { nama: 'Animasi Digital', kategori: 'Kreatif & Desain', durasi: '4 Bulan', difficulty: 'Menengah', Icon: Film, iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
+  // Teknologi & Digital
+  { nama: 'Digital Marketing',        kategori: 'Teknologi & Digital',   durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Smartphone,    iconBg: 'bg-blue-100',   iconColor: 'text-blue-600' },
+  { nama: 'Data Analysis',            kategori: 'Teknologi & Digital',   durasi: '3 Bulan', difficulty: 'Menengah', Icon: BarChart2,     iconBg: 'bg-blue-100',   iconColor: 'text-blue-600' },
+  { nama: 'Web Development',          kategori: 'Teknologi & Digital',   durasi: '3 Bulan', difficulty: 'Menengah', Icon: Monitor,       iconBg: 'bg-blue-100',   iconColor: 'text-blue-600' },
+  { nama: 'Desain UI/UX',             kategori: 'Teknologi & Digital',   durasi: '2 Bulan', difficulty: 'Menengah', Icon: Palette,       iconBg: 'bg-blue-100',   iconColor: 'text-blue-600' },
+  // Kuliner & F&B
+  { nama: 'Barista',                  kategori: 'Kuliner & F&B',         durasi: '1 Bulan', difficulty: 'Pemula',   Icon: Coffee,        iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
+  { nama: 'Pastry & Bakery',          kategori: 'Kuliner & F&B',         durasi: '2 Bulan', difficulty: 'Pemula',   Icon: ChefHat,       iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
+  { nama: 'Tata Boga',                kategori: 'Kuliner & F&B',         durasi: '3 Bulan', difficulty: 'Pemula',   Icon: UtensilsCrossed, iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
+  { nama: 'Pengolahan Makanan Sehat', kategori: 'Kuliner & F&B',         durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Leaf,          iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
+  // Kreatif & Desain
+  { nama: 'Desain Grafis',            kategori: 'Kreatif & Desain',      durasi: '2 Bulan', difficulty: 'Pemula',   Icon: PenTool,       iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
+  { nama: 'Fotografi & Videografi',   kategori: 'Kreatif & Desain',      durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Camera,        iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
+  { nama: 'Animasi Digital',          kategori: 'Kreatif & Desain',      durasi: '3 Bulan', difficulty: 'Menengah', Icon: Film,          iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
+  // Teknik & Mesin
+  { nama: 'Las Plat',                 kategori: 'Teknik & Mesin',        durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Wrench,        iconBg: 'bg-amber-100',  iconColor: 'text-amber-700' },
+  { nama: 'Las Pipa',                 kategori: 'Teknik & Mesin',        durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Wrench,        iconBg: 'bg-amber-100',  iconColor: 'text-amber-700' },
+  { nama: 'Sistem Injeksi',           kategori: 'Teknik & Mesin',        durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Zap,           iconBg: 'bg-amber-100',  iconColor: 'text-amber-700' },
+  { nama: 'Service Sepeda Motor',     kategori: 'Teknik & Mesin',        durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Wrench,        iconBg: 'bg-amber-100',  iconColor: 'text-amber-700' },
+  { nama: 'Mechanical Electrical',    kategori: 'Teknik & Mesin',        durasi: '3 Bulan', difficulty: 'Menengah', Icon: Zap,           iconBg: 'bg-amber-100',  iconColor: 'text-amber-700' },
+  // Hospitality
+  { nama: 'Housekeeping',             kategori: 'Hospitality',           durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Hotel,         iconBg: 'bg-teal-100',   iconColor: 'text-teal-600' },
+  { nama: 'Food and Beverage Service',kategori: 'Hospitality',           durasi: '2 Bulan', difficulty: 'Pemula',   Icon: UtensilsCrossed, iconBg: 'bg-teal-100', iconColor: 'text-teal-600' },
+  // Kecantikan & Spa
+  { nama: 'Perawatan Kecantikan',     kategori: 'Kecantikan & Spa',      durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Sparkles,      iconBg: 'bg-pink-100',   iconColor: 'text-pink-600' },
+  { nama: 'Make Up Artist',           kategori: 'Kecantikan & Spa',      durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Heart,         iconBg: 'bg-pink-100',   iconColor: 'text-pink-600' },
+  { nama: 'Terapis Spa',              kategori: 'Kecantikan & Spa',      durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Heart,         iconBg: 'bg-pink-100',   iconColor: 'text-pink-600' },
+  { nama: 'Perias Rambut',            kategori: 'Kecantikan & Spa',      durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Scissors,      iconBg: 'bg-pink-100',   iconColor: 'text-pink-600' },
+  // Bahasa & Komunikasi
+  { nama: 'Bahasa Inggris',           kategori: 'Bahasa & Komunikasi',   durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Globe,         iconBg: 'bg-sky-100',    iconColor: 'text-sky-600' },
+  { nama: 'Bahasa Jepang',            kategori: 'Bahasa & Komunikasi',   durasi: '3 Bulan', difficulty: 'Pemula',   Icon: Globe,         iconBg: 'bg-sky-100',    iconColor: 'text-sky-600' },
+  // Bisnis & Administrasi
+  { nama: 'Administrasi Perkantoran', kategori: 'Bisnis & Administrasi', durasi: '2 Bulan', difficulty: 'Pemula',   Icon: BookOpen,      iconBg: 'bg-slate-100',  iconColor: 'text-slate-600' },
+  // Mode & Busana
+  { nama: 'Penjahit Busana',          kategori: 'Mode & Busana',         durasi: '3 Bulan', difficulty: 'Pemula',   Icon: Shirt,         iconBg: 'bg-rose-100',   iconColor: 'text-rose-600' },
+  // Keamanan
+  { nama: 'Petugas Keamanan',         kategori: 'Keamanan',              durasi: '2 Bulan', difficulty: 'Pemula',   Icon: Shield,        iconBg: 'bg-gray-100',   iconColor: 'text-gray-600' },
 ];
 
-const KATEGORI_TABS: Kategori[] = ['Semua', 'Teknologi & Digital', 'Kuliner & F&B', 'Kreatif & Desain'];
+const KATEGORI_TABS: Kategori[] = [
+  'Semua',
+  'Teknologi & Digital',
+  'Kuliner & F&B',
+  'Kreatif & Desain',
+  'Teknik & Mesin',
+  'Hospitality',
+  'Kecantikan & Spa',
+  'Bahasa & Komunikasi',
+  'Bisnis & Administrasi',
+  'Mode & Busana',
+  'Keamanan',
+];
 
 const KATEGORI_COLOR: Record<Kategori, string> = {
-  'Semua': 'bg-gray-100 text-gray-600',
+  'Semua':               'bg-gray-100 text-gray-600',
   'Teknologi & Digital': 'bg-blue-50 text-blue-700',
-  'Kuliner & F&B': 'bg-orange-50 text-orange-700',
-  'Kreatif & Desain': 'bg-purple-50 text-purple-700',
+  'Kuliner & F&B':       'bg-orange-50 text-orange-700',
+  'Kreatif & Desain':    'bg-purple-50 text-purple-700',
+  'Teknik & Mesin':      'bg-amber-50 text-amber-700',
+  'Hospitality':         'bg-teal-50 text-teal-700',
+  'Kecantikan & Spa':    'bg-pink-50 text-pink-700',
+  'Bahasa & Komunikasi': 'bg-sky-50 text-sky-700',
+  'Bisnis & Administrasi':'bg-slate-100 text-slate-600',
+  'Mode & Busana':       'bg-rose-50 text-rose-700',
+  'Keamanan':            'bg-gray-100 text-gray-600',
 };
 
 const SOAL = [
@@ -395,79 +452,161 @@ function HalamanHasil({ nilai, jawaban, onKembali }: { nilai: number; jawaban: n
 export default function OnlineTest() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [showLoginMsg, setShowLoginMsg] = useState(false);
   const [fase, setFase] = useState<'info' | 'ujian' | 'hasil'>('info');
   const [hasil, setHasil] = useState<{ nilai: number; jawaban: number[] } | null>(null);
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
-  const [activeKategori, setActiveKategori] = useState<Kategori>('Semua');
 
-  const filteredPrograms = activeKategori === 'Semua'
-    ? PROGRAMS
-    : PROGRAMS.filter(p => p.kategori === activeKategori);
+  // Baca registrasi dari localStorage — sama dengan pola KelasSaya
+  const reg = (() => {
+    try {
+      const list = JSON.parse(localStorage.getItem('ppkd_registrations') || '[]');
+      return (user
+        ? list.find((r: { email: string }) => r.email === user.email)
+        : list[0]) ?? null;
+    } catch { return null; }
+  })();
 
-  const handleMulaiTest = () => {
-    if (!user) { setShowLoginMsg(true); return; }
-    if (!selectedProgram) return;
-    setShowLoginMsg(false);
-    setFase('ujian');
-  };
+  // Temukan objek Program yang cocok dengan program yang didaftarkan
+  const registeredProgram = reg
+    ? PROGRAMS.find(p => p.nama === reg.program) ?? null
+    : null;
 
   const handleSelesai = (nilai: number, jawaban: number[]) => {
+    // Simpan hasil test ke registrasi di localStorage
+    try {
+      const list = JSON.parse(localStorage.getItem('ppkd_registrations') || '[]');
+      const updated = list.map((r: { email: string }) =>
+        r.email === (user?.email ?? '') ? { ...r, testCompleted: true, testNilai: nilai } : r
+      );
+      localStorage.setItem('ppkd_registrations', JSON.stringify(updated));
+    } catch { /* ignore */ }
     setHasil({ nilai, jawaban });
     setFase('hasil');
   };
 
-  const handleKembali = () => {
-    navigate('/');
-  };
+  if (fase === 'ujian') return (
+    <HalamanUjian onSelesai={handleSelesai} namaProgram={registeredProgram?.nama ?? ''} />
+  );
+  if (fase === 'hasil' && hasil) return (
+    <HalamanHasil nilai={hasil.nilai} jawaban={hasil.jawaban} onKembali={() => navigate('/')} />
+  );
 
-  if (fase === 'ujian') return <HalamanUjian onSelesai={handleSelesai} namaProgram={selectedProgram?.nama ?? ''} />;
-  if (fase === 'hasil' && hasil) return <HalamanHasil nilai={hasil.nilai} jawaban={hasil.jawaban} onKembali={handleKembali} />;
+  // ── Gate: belum login ──
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PageHeader
+          crumbs={[{ label: 'Pelatihan' }, { label: 'Online Test' }]}
+          title="Online Test"
+          subtitle="Uji kompetensi seleksi masuk program pelatihan"
+        />
+        <div className="flex items-center justify-center py-24 px-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 max-w-md w-full text-center">
+            <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <AlertCircle className="w-7 h-7 text-blue-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Login Terlebih Dahulu</h2>
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+              Anda perlu login untuk mengakses Online Test.
+            </p>
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold transition-colors"
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  // ── Gate: belum mendaftar ──
+  if (!reg) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PageHeader
+          crumbs={[{ label: 'Pelatihan' }, { label: 'Online Test' }]}
+          title="Online Test"
+          subtitle="Uji kompetensi seleksi masuk program pelatihan"
+        />
+        <div className="flex items-center justify-center py-24 px-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 max-w-md w-full text-center">
+            <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <AlertCircle className="w-7 h-7 text-yellow-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Belum Mendaftar</h2>
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+              Online Test hanya tersedia untuk pendaftar yang telah mengisi formulir pendaftaran. Daftar terlebih dahulu untuk mengakses fitur ini.
+            </p>
+            <button
+              onClick={() => navigate('/pendaftaran')}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold transition-colors mb-3"
+            >
+              Daftar Sekarang
+            </button>
+            <button
+              onClick={() => navigate('/program-jadwal')}
+              className="w-full border border-gray-200 text-gray-600 hover:text-gray-900 py-3 rounded-full font-semibold transition-colors text-sm"
+            >
+              Lihat Program Pelatihan
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Halaman utama: program terkunci sesuai pendaftaran ──
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+      <PageHeader
+        crumbs={[{ label: 'Pelatihan' }, { label: 'Online Test' }]}
+        title="Online Test"
+        subtitle="Uji kompetensi seleksi masuk program pelatihan"
+      />
+      <section className="py-12">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 space-y-6">
 
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Tentang Online Test</h2>
-            <p className="text-gray-600 mb-8">
-              Online test merupakan tahap seleksi awal untuk mengukur kemampuan dasar dan kesiapan calon peserta pelatihan. Test ini dirancang untuk memastikan peserta memiliki pemahaman yang cukup untuk mengikuti program pelatihan yang dipilih.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-xl p-6 flex items-center gap-4 shadow-sm border border-gray-100">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-7 h-7 text-blue-600" />
+          {/* Program terdaftar — terkunci */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-3">Program Anda</p>
+            <div className="flex items-center gap-4">
+              {registeredProgram && (
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${registeredProgram.iconBg}`}>
+                  <registeredProgram.Icon className={`w-6 h-6 ${registeredProgram.iconColor}`} />
                 </div>
-                <div>
-                  <h3 className="font-bold text-2xl text-gray-900">{SOAL.length} Soal</h3>
-                  <p className="text-sm text-gray-500">Pilihan ganda</p>
-                </div>
+              )}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{reg.program}</h2>
+                {registeredProgram && (
+                  <p className="text-sm text-gray-400 mt-0.5">
+                    {registeredProgram.kategori} · {registeredProgram.durasi} · {registeredProgram.difficulty}
+                  </p>
+                )}
               </div>
-              <div className="bg-white rounded-xl p-6 flex items-center gap-4 shadow-sm border border-gray-100">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-7 h-7 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-2xl text-gray-900">60 Menit</h3>
-                  <p className="text-sm text-gray-500">Waktu pengerjaan</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-6 flex items-center gap-4 shadow-sm border border-gray-100">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-7 h-7 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-2xl text-gray-900">Nilai Min. 70</h3>
-                  <p className="text-sm text-gray-500">Untuk lulus seleksi</p>
-                </div>
-              </div>
+              <span className="ml-auto text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1 rounded-full">Terdaftar</span>
             </div>
           </div>
 
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Petunjuk Pengerjaan</h2>
-            <div className="flex flex-col gap-3">
+          {/* Info test */}
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { Icon: FileText, label: `${SOAL.length} Soal`, sub: 'Pilihan ganda' },
+              { Icon: Clock,    label: '60 Menit',             sub: 'Waktu pengerjaan' },
+              { Icon: CheckCircle, label: 'Min. 70',           sub: 'Nilai kelulusan' },
+            ].map(({ Icon, label, sub }) => (
+              <div key={label} className="bg-white rounded-xl p-5 text-center border border-gray-100 shadow-sm">
+                <Icon className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                <p className="font-bold text-gray-900">{label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Petunjuk */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="font-bold text-gray-900 mb-4">Petunjuk Pengerjaan</h3>
+            <div className="space-y-3">
               {[
                 'Pastikan koneksi internet Anda stabil sebelum memulai test',
                 'Baca setiap soal dengan teliti sebelum menjawab',
@@ -475,131 +614,35 @@ export default function OnlineTest() {
                 'Klik tombol "Submit" setelah selesai mengerjakan semua soal',
                 'Hasil test akan langsung ditampilkan setelah submit',
               ].map((item, i) => (
-                <div key={i} className="flex gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100">
-                  <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">{i + 1}</span>
-                  <span className="text-gray-700 text-base">{item}</span>
+                <div key={i} className="flex gap-3">
+                  <span className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">{i + 1}</span>
+                  <span className="text-sm text-gray-600 leading-relaxed">{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-            <div className="flex gap-3">
-              <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-gray-900 mb-2">Perhatian!</h3>
-                <ul className="space-y-1.5 text-sm text-gray-700">
-                  <li>• Test hanya dapat dikerjakan satu kali</li>
-                  <li>• Jangan menutup browser atau refresh halaman saat mengerjakan test</li>
-                  <li>• Jika terjadi gangguan teknis, segera hubungi administrator</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Pilih Program */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Pilih Program Pelatihan</h2>
-            <p className="text-gray-500 mb-6">Pilih salah satu program di bawah untuk mengikuti test seleksi.</p>
-
-            {/* Tab kategori */}
-            <div className="flex flex-wrap gap-2 mb-5">
-              {KATEGORI_TABS.map(k => (
-                <button
-                  key={k}
-                  onClick={() => setActiveKategori(k)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
-                    activeKategori === k
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-500 border-gray-200 hover:border-blue-300'
-                  }`}
-                >
-                  {k}
-                </button>
-              ))}
-            </div>
-
-            {/* Grid card program */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredPrograms.map(program => {
-                const isSelected = selectedProgram?.nama === program.nama;
-                return (
-                  <button
-                    key={program.nama}
-                    onClick={() => setSelectedProgram(isSelected ? null : program)}
-                    className={`text-left rounded-2xl border-2 p-5 transition-all ${
-                      isSelected
-                        ? 'border-blue-600 bg-blue-50 shadow-md shadow-blue-100'
-                        : 'border-gray-100 bg-white hover:border-blue-300 hover:shadow-sm'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-blue-200' : program.iconBg}`}>
-                        <program.Icon className={`w-5 h-5 ${isSelected ? 'text-blue-700' : program.iconColor}`} />
-                      </div>
-                      {isSelected && (
-                        <span className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                          <CheckCircle className="w-3 h-3 text-white" />
-                        </span>
-                      )}
-                    </div>
-                    <h3 className={`font-bold text-base mb-2 ${isSelected ? 'text-blue-800' : 'text-gray-900'}`}>
-                      {program.nama}
-                    </h3>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${KATEGORI_COLOR[program.kategori]}`}>
-                        {program.kategori}
-                      </span>
-                      <span className="text-xs text-gray-400">{program.durasi}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        program.difficulty === 'Pemula' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600'
-                      }`}>{program.difficulty}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Selected program banner + Mulai Test */}
-          <div className={`sticky bottom-4 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg border transition-all ${
-            selectedProgram
-              ? 'bg-blue-700 border-blue-700'
-              : 'bg-white border-gray-200'
-          }`}>
+          {/* Perhatian */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
-              {selectedProgram ? (
-                <>
-                  <p className="text-xs text-blue-200 mb-0.5">Program dipilih</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <selectedProgram.Icon className="w-4 h-4 text-white" />
-                    </div>
-                    <p className="font-bold text-white text-lg">{selectedProgram.nama}</p>
-                  </div>
-                </>
-              ) : (
-                <p className="text-gray-400 text-sm font-medium">Pilih program pelatihan terlebih dahulu untuk memulai test</p>
-              )}
-            </div>
-            <div className="flex flex-col items-center sm:items-end gap-1 flex-shrink-0">
-              <button
-                onClick={handleMulaiTest}
-                disabled={!selectedProgram}
-                className={`px-8 py-3 rounded-xl font-bold text-base transition-all flex items-center gap-2 ${
-                  selectedProgram
-                    ? 'bg-white text-blue-700 hover:bg-blue-50 shadow-sm'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                MULAI TEST
-                <Arrow className="w-4 h-4" />
-              </button>
-              {showLoginMsg && (
-                <p className="text-xs text-red-300 font-medium">Login untuk mengerjakan test</p>
-              )}
+              <p className="font-semibold text-gray-900 mb-1.5 text-sm">Perhatian</p>
+              <ul className="space-y-1 text-sm text-gray-600">
+                <li>· Test hanya dapat dikerjakan satu kali</li>
+                <li>· Jangan menutup browser atau refresh halaman saat mengerjakan test</li>
+                <li>· Jika terjadi gangguan teknis, segera hubungi administrator</li>
+              </ul>
             </div>
           </div>
+
+          {/* Tombol mulai */}
+          <button
+            onClick={() => setFase('ujian')}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold text-base transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            Mulai Online Test — {reg.program}
+            <Arrow className="w-5 h-5" />
+          </button>
 
         </div>
       </section>

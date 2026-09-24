@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BarChart3, TrendingUp, Users, Award, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import PageHeader from './PageHeader';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -159,6 +160,11 @@ export default function DataPelatihan() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Pusat Informasi' }, { label: 'Data Pelatihan' }]}
+        title="Data Pelatihan"
+        subtitle="Statistik dan data pelatihan PPKD Jakarta Timur"
+      />
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
@@ -199,7 +205,6 @@ export default function DataPelatihan() {
             {/* Grouped horizontal bar */}
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
               <h3 className="font-semibold text-gray-900 leading-tight">Peserta & Lulus per Program</h3>
-              <p className="text-xs text-gray-400 mt-0.5 mb-5">Tahun 2024 — gunakan filter kategori untuk mempersempit</p>
               <ResponsiveContainer width="100%" height={320}>
                 <BarChart
                   data={barData}
@@ -248,7 +253,8 @@ export default function DataPelatihan() {
               </h3>
               <p className="text-xs text-gray-400 mt-0.5 mb-4">Porsi total peserta</p>
 
-              <div className="relative flex-1">
+              <div className="flex-1 flex items-center justify-center">
+                <div className="relative w-full h-[200px]">
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie
@@ -268,12 +274,14 @@ export default function DataPelatihan() {
                     <Tooltip content={<PieTooltipContent />} />
                   </PieChart>
                 </ResponsiveContainer>
+                  
                 {/* center label */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900 leading-none">{totalPeserta}</div>
                     <div className="text-[10px] text-gray-400 mt-1 tracking-wide uppercase">Peserta</div>
                   </div>
+                </div>
                 </div>
               </div>
 
@@ -297,7 +305,6 @@ export default function DataPelatihan() {
           {/* ── Chart row 2: kelulusan rate ── */}
           <div className="bg-white rounded-xl shadow-md p-6 mb-8">
             <h3 className="font-semibold text-gray-900 leading-tight">Tingkat Kelulusan per Program</h3>
-            <p className="text-xs text-gray-400 mt-0.5 mb-5">Diurutkan dari tertinggi — Tahun 2024</p>
             <ResponsiveContainer width="100%" height={Math.max(200, kelulusanData.length * 34)}>
               <BarChart
                 data={kelulusanData}
@@ -368,7 +375,6 @@ export default function DataPelatihan() {
                             color: CAT_COLORS[item.kategori],
                           }}
                         >
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: CAT_COLORS[item.kategori] }} />
                           {item.kategori}
                         </span>
                       </td>

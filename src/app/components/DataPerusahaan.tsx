@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Building2, MapPin, Phone, Globe, Search, X, Users } from 'lucide-react';
+import PageHeader from './PageHeader';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -139,6 +140,11 @@ export default function DataPerusahaan() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Pusat Informasi' }, { label: 'Data Perusahaan' }]}
+        title="Data Perusahaan"
+        subtitle="Perusahaan mitra penempatan alumni PPKD Jakarta Timur"
+      />
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 

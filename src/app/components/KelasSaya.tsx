@@ -1,4 +1,6 @@
-import { BookOpen, Calendar, Clock, MapPin, User, FileText, CheckCircle, Bell, Download } from 'lucide-react';
+import { BookOpen, Calendar, Clock, MapPin, User, FileText, CheckCircle, Bell, Download, ClipboardList } from 'lucide-react';
+import { Link } from 'react-router';
+import PageHeader from './PageHeader';
 
 interface Registration {
   email: string;
@@ -6,6 +8,7 @@ interface Registration {
   tanggal: string;
   status: string;
   nama?: string;
+  testCompleted?: boolean;
 }
 
 const PROGRAM_DETAILS: Record<string, {
@@ -118,25 +121,71 @@ export default function KelasSaya() {
         .toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
     : '–';
 
+  // Gate: belum menyelesaikan online test
+  if (reg && !reg.testCompleted) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PageHeader
+          crumbs={[{ label: 'Beranda' }, { label: 'Kelas Saya' }]}
+          title="Kelas Saya"
+          subtitle="Informasi dan jadwal kelas pelatihan Anda"
+        />
+        <div className="flex items-center justify-center py-24 px-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 max-w-md w-full text-center">
+            <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <ClipboardList className="w-7 h-7 text-blue-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Selesaikan Online Test Terlebih Dahulu</h2>
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+              Pendaftaran Anda untuk program <span className="font-semibold text-gray-700">{reg.program}</span> telah disetujui. Silakan selesaikan online test seleksi sebelum mengakses materi kelas.
+            </p>
+            <Link
+              to="/online-test"
+              className="w-full inline-block bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold transition-colors text-sm"
+            >
+              Kerjakan Online Test Sekarang
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Beranda' }, { label: 'Kelas Saya' }]}
+        title="Kelas Saya"
+        subtitle="Informasi dan jadwal kelas pelatihan Anda"
+      />
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8 py-10">
 
         {/* Welcome card */}
-        <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl p-7 text-white shadow-lg flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <BookOpen className="w-8 h-8 text-white" />
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-blue-600 p-6 flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-7 h-7 text-blue-600" />
           </div>
+ 
           <div className="flex-1 min-w-0">
-            <p className="text-blue-200 text-sm font-medium mb-1">Program yang diikuti</p>
-            <h1 className="text-2xl font-bold leading-tight">{reg?.program ?? 'Program Pelatihan'}</h1>
-            <p className="text-blue-200 text-sm mt-1">Pendaftaran disetujui · Mulai {tanggalMulai}</p>
+            <p className="text-sm text-gray-500 mb-0.5">Program yang diikuti</p>
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              {reg?.program ?? 'Program Pelatihan'}
+            </h1>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-2 text-sm text-gray-500">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                Pendaftaran disetujui
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                Mulai {tanggalMulai}
+              </span>
+            </div>
           </div>
-          <div className="bg-white/20 rounded-xl px-4 py-3 text-center flex-shrink-0">
-            <p className="text-xs text-blue-200">Status</p>
-            <p className="font-bold text-sm flex items-center gap-1.5 mt-0.5">
-              <CheckCircle className="w-4 h-4" /> Aktif
-            </p>
+ 
+          <div className="bg-green-50 border border-green-100 rounded-xl px-5 py-3 text-center flex-shrink-0 self-start sm:self-center">
+            <p className="text-xs text-green-600">Status</p>
+            <p className="font-bold text-green-700 mt-0.5">Aktif</p>
           </div>
         </div>
 
@@ -167,22 +216,22 @@ export default function KelasSaya() {
             {/* Materi */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-purple-600" />
+                <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Materi Pelatihan</h2>
               </div>
               <ul className="space-y-2.5">
                 {detail.materi.map((m, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
                       {i + 1}
                     </span>
                     <span className="text-sm text-gray-700">{m}</span>
                   </li>
                 ))}
               </ul>
-              <button className="mt-5 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-sm font-medium text-gray-600 transition-colors">
+              <button className="mt-5 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 text-sm font-medium transition-colors">
                 <Download className="w-4 h-4" />
                 Unduh Modul Pelatihan (PDF)
               </button>
@@ -191,15 +240,15 @@ export default function KelasSaya() {
             {/* Pengumuman */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Bell className="w-5 h-5 text-yellow-600" />
+                <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-blue-600" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Pengumuman</h2>
               </div>
               <div className="space-y-3">
                 {PENGUMUMAN.map((p, i) => (
-                  <div key={i} className="bg-yellow-50 border border-yellow-100 rounded-xl px-4 py-3">
-                    <p className="text-xs text-yellow-600 font-medium mb-1">{p.tanggal}</p>
+                  <div key={i} className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                    <p className="text-xs text-blue-500 font-medium mb-1">{p.tanggal}</p>
                     <p className="text-sm text-gray-700">{p.isi}</p>
                   </div>
                 ))}
@@ -213,8 +262,8 @@ export default function KelasSaya() {
               <h2 className="text-lg font-bold text-gray-900">Info Kelas</h2>
 
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <User className="w-4 h-4 text-green-600" />
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User className="w-4 h-4 text-blue-600" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 mb-0.5">Instruktur</p>
@@ -223,8 +272,8 @@ export default function KelasSaya() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <MapPin className="w-4 h-4 text-orange-600" />
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <MapPin className="w-4 h-4 text-blue-600" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 mb-0.5">Ruang Kelas</p>
@@ -248,14 +297,19 @@ export default function KelasSaya() {
             </div>
 
             {/* Kontak instruktur */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 rounded-2xl p-5 text-center">
+            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
               <p className="text-xs text-gray-500 mb-2">Ada pertanyaan?</p>
               <p className="text-sm font-semibold text-gray-800 mb-3">Hubungi instruktur atau admin PPKD</p>
               <a
                 href="https://wa.me/6221"
-                className="inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+               target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
               >
-                WhatsApp Admin
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                </svg>
+                Hubungi Admin
               </a>
             </div>
           </div>

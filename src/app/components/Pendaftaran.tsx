@@ -1,10 +1,16 @@
 import { FileText, CheckCircle, Users, Calendar, Heart, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import PageHeader from './PageHeader';
 
 export default function Pendaftaran() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Pelatihan' }, { label: 'Pendaftaran' }]}
+        title="Pendaftaran"
+        subtitle="Daftarkan diri Anda untuk mengikuti program pelatihan PPKD Jakarta Timur"
+      />
       {/* Content */}
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -112,24 +118,35 @@ export default function Pendaftaran() {
           </div>
 
           {/* CTA */}
-          <div className="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 text-white rounded-xl p-8 text-center shadow-xl">
-            <h2 className="text-3xl font-bold mb-4">
+          <div className="bg-white rounded-xl shadow-md px-6 py-10 sm:px-10 text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
               Yuk, Wujudkan Mimpimu Sekarang!
             </h2>
-            <p className="text-xl mb-3">
+            <p className="text-lg text-gray-600 mt-3">
               Ribuan alumni kami sudah berhasil. Sekarang giliranmu!
             </p>
-            <p className="text-lg mb-6 text-blue-100">
-              Pelatihan berkualitas, <span className="font-bold">GRATIS</span>, dan langsung tersalurkan ke dunia kerja
-            </p>
+ 
+            <ul className="flex flex-wrap justify-center gap-3 mt-6">
+              {['Pelatihan berkualitas', 'Gratis, tanpa biaya', 'Tersalurkan ke dunia kerja'].map((item) => (
+                <li
+                  key={item}
+                  className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-semibold px-4 py-2 rounded-full"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+ 
             <button
               onClick={() => navigate('/form-pendaftaran')}
-              className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
+              className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg shadow-blue-600/25 transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
-              DAFTAR SEKARANG - GRATIS!
+              Daftar Gratis Sekarang
             </button>
-            <p className="text-sm mt-4 text-blue-100">
-              Kuota terbatas! Jangan sampai menyesal karena kehabisan kuota
+ 
+            <p className="block w-fit mx-auto mt-5 bg-amber-50 text-amber-700 text-sm font-medium px-4 py-1.5 rounded-full">
+              Kuota terbatas, daftar sebelum penuh!
             </p>
           </div>
         </div>

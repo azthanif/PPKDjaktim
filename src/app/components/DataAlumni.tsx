@@ -1,4 +1,5 @@
 import { Briefcase, TrendingUp, Building2 } from 'lucide-react';
+import PageHeader from './PageHeader';
 
 const TOTAL_ALUMNI = 20_450;
 const LAKI = 12_270;   // 60%
@@ -90,6 +91,11 @@ export default function DataAlumni() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader
+        crumbs={[{ label: 'Pusat Informasi' }, { label: 'Data Alumni' }]}
+        title="Data Alumni"
+        subtitle="Sebaran dan data alumni PPKD Jakarta Timur"
+      />
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
 
