@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { Building2, MapPin, Phone, Globe, Search, X, Users } from 'lucide-react';
 import PageHeader from './PageHeader';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell,
-} from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 const LOC_COLORS: Record<string, string> = {
   'Jakarta':   '#2563EB',
@@ -71,20 +68,6 @@ const perusahaanMitra = [
     alamat: 'Jl. Japati No.1, Citarum, Bandung, Jawa Barat',
   },
 ];
-
-function BarTooltipContent({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2.5 text-xs min-w-[160px]">
-      <p className="font-semibold text-gray-800 mb-2 leading-tight">{label}</p>
-      <div className="flex items-center gap-1.5">
-        <span className="w-2 h-2 rounded-sm" style={{ background: '#2563EB' }} />
-        <span className="text-gray-500">Alumni ditempatkan:</span>
-        <span className="font-semibold text-gray-900">{payload[0].value}</span>
-      </div>
-    </div>
-  );
-}
 
 function PieTooltipContent({ active, payload }: any) {
   if (!active || !payload?.length) return null;
@@ -167,36 +150,29 @@ export default function DataPerusahaan() {
           {/* ── Charts ─────────────────────────────────────────── */}
           <div className="grid lg:grid-cols-5 gap-6 mb-8">
 
-            {/* Bar: alumni per perusahaan */}
+            {/* Custom CSS bar: alumni per perusahaan */}
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
               <h3 className="font-semibold text-gray-900 leading-tight">Alumni Ditempatkan per Perusahaan</h3>
               <p className="text-xs text-gray-400 mt-0.5 mb-5">Jumlah lulusan PPKD yang bekerja di setiap mitra</p>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart
-                  data={penempatanData}
-                  layout="vertical"
-                  barSize={13}
-                  margin={{ top: 0, right: 40, bottom: 0, left: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
-                  <XAxis
-                    type="number"
-                    tick={{ fill: '#9CA3AF', fontSize: 11 }}
-                    axisLine={{ stroke: '#E5E7EB' }}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    width={162}
-                    tick={{ fill: '#374151', fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip content={<BarTooltipContent />} cursor={{ fill: '#F9FAFB' }} />
-                  <Bar key="bar-alumni" dataKey="Alumni" name="Alumni" fill="#2563EB" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {(() => {
+                const maxVal = Math.max(...penempatanData.map(d => d['Alumni']));
+                return (
+                  <div className="space-y-3">
+                    {penempatanData.map((d, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="text-xs text-gray-600 w-40 flex-shrink-0 truncate">{d.name}</span>
+                        <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                            style={{ width: `${(d['Alumni'] / maxVal) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-blue-700 w-8 text-right flex-shrink-0">{d['Alumni']}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Donut: distribusi per lokasi */}

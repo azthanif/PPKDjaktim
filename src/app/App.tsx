@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router';
-import { ChevronDown, User, LogOut, ClipboardList, X, CheckCircle, Clock, FileText, BookOpen } from 'lucide-react';
+import { ChevronDown, User, LogOut, ClipboardList, X, CheckCircle, Clock, FileText, BookOpen, Star } from 'lucide-react';
 import LoadingBar from './components/LoadingBar';
 import ChatbotAssistant from './components/ChatbotAssistant';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
@@ -21,6 +21,7 @@ import Berita from './components/Berita';
 import ProfilPengguna from './components/ProfilPengguna';
 import FormPendaftaran from './components/FormPendaftaran';
 import KelasSaya from './components/KelasSaya';
+import Penilaian from './components/Penilaian';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -85,6 +86,7 @@ function Layout({ children }: { children: React.ReactNode }) {
     if (path.includes('/tentang-kami') || path.includes('/visi-misi') || path.includes('/struktur-organisasi') || path.includes('/profil-lembaga')) return 'Profil Lembaga';
     if (path.includes('/pendaftaran') || path.includes('/program-jadwal') || path.includes('/online-test')) return 'Pelatihan';
     if (path.includes('/data-pelatihan') || path.includes('/data-alumni') || path.includes('/data-perusahaan') || path.includes('/berita')) return 'Pusat Informasi';
+    if (path.includes('/penilaian')) return 'Penilaian';
     return 'Beranda';
   };
 
@@ -228,6 +230,18 @@ function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 )}
               </div>
+
+              <Link
+                to="/penilaian"
+                className={`px-4 py-2 rounded-md text-base transition-all flex items-center gap-1.5 ${
+                  activeMenu === 'Penilaian'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                <Star className={`w-4 h-4 ${activeMenu === 'Penilaian' ? 'fill-white text-white' : 'fill-amber-400 text-amber-400'}`} />
+                Penilaian
+              </Link>
             </nav>
 
             {/* Auth area */}
@@ -509,6 +523,7 @@ function AppRoutes() {
         <Route path="/berita/:id" element={<Berita />} />
         <Route path="/profil" element={<ProfilPengguna />} />
         <Route path="/kelas-saya" element={<KelasSaya />} />
+        <Route path="/penilaian" element={<Penilaian />} />
       </Routes>
     </Layout>
   );

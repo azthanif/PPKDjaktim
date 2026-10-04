@@ -31,7 +31,26 @@ export default function Register() {
       setPasswordError('Password tidak cocok');
       return;
     }
-    // Simpan data registrasi tanpa auto-login, arahkan ke halaman login
+    // Simpan data user ke ppkd_registered_users agar Login bisa membaca phone & address
+    try {
+      const newUser = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+      };
+
+      // Upsert: ganti kalau sudah ada, tambah kalau belum
+      const existing: Array<{ email: string }> = JSON.parse(localStorage.getItem('ppkd_registered_users') || '[]');
+      const idx = existing.findIndex(u => u.email.toLowerCase() === formData.email.toLowerCase());
+      if (idx >= 0) existing[idx] = newUser; else existing.push(newUser);
+      localStorage.setItem('ppkd_registered_users', JSON.stringify(existing));
+
+      // Hapus email dari daftar yang dihapus agar bisa login lagi
+      const deleted: string[] = JSON.parse(localStorage.getItem('ppkd_deleted_emails') || '[]');
+      const cleaned = deleted.filter(e => e !== formData.email.toLowerCase());
+      localStorage.setItem('ppkd_deleted_emails', JSON.stringify(cleaned));
+    } catch {}
     navigate('/login');
   };
 

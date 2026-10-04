@@ -1,11 +1,48 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Calendar, Clock, Users, Sparkles, Target, Lightbulb, X, Hand, Heart, Trash2, ChevronLeft, ChevronRight, Search, ChevronUp, ChevronDown, ChevronsUpDown, Monitor, Wrench, Globe, Shield, Hotel, Scissors, BookOpen, Shirt } from 'lucide-react';
 import PageHeader from './PageHeader';
 
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+  return dp[m][n];
+}
+
 export default function ProgramJadwal() {
   const navigate = useNavigate();
+
+  const handleDaftar = () => {
+    try {
+      const stored = localStorage.getItem('ppkd_user');
+      if (stored) {
+        navigate('/form-pendaftaran');
+      } else {
+        navigate('/register');
+      }
+    } catch {
+      navigate('/register');
+    }
+  };
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   type JadwalKey = 'program' | 'pendaftaran' | 'seleksi' | 'pengumuman' | 'daftarUlang' | 'pelatihan' | 'uji' | 'kuota';
   const [jadwalSort, setJadwalSort] = useState<{ key: JadwalKey; dir: 'asc' | 'desc' }>({ key: 'program', dir: 'asc' });
@@ -91,7 +128,7 @@ export default function ProgramJadwal() {
   };
 
   type Program = {
-    name: string; durasi: string; jadwal: string; kuota: number; terisi: number;
+    name: string; durasi: string; jadwal: string; kuota: number; terisi: number; kuotaPelatihan: number;
     kategori: string; difficulty: string; jobProspect: string;
     deskripsi: string; modul: string[]; syarat: string[]; fasilitas: string[];
   };
@@ -101,7 +138,7 @@ export default function ProgramJadwal() {
       name: 'Barista',
       durasi: '1 Bulan',
       jadwal: 'Senin - Jumat, 08:00 - 14:00',
-      kuota: 15, terisi: 13,
+      kuota: 15, terisi: 13, kuotaPelatihan: 12,
       kategori: 'kuliner',
       difficulty: 'Pemula',
       jobProspect: 'Tinggi',
@@ -114,7 +151,7 @@ export default function ProgramJadwal() {
       name: 'Pastry & Bakery',
       durasi: '2 Bulan',
       jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 12,
+      kuota: 20, terisi: 12, kuotaPelatihan: 15,
       kategori: 'kuliner',
       difficulty: 'Pemula',
       jobProspect: 'Tinggi',
@@ -127,7 +164,7 @@ export default function ProgramJadwal() {
       name: 'Tata Boga',
       durasi: '3 Bulan',
       jadwal: 'Senin - Jumat, 08:00 - 16:00',
-      kuota: 20, terisi: 8,
+      kuota: 20, terisi: 8, kuotaPelatihan: 16,
       kategori: 'kuliner',
       difficulty: 'Pemula',
       jobProspect: 'Sangat Tinggi',
@@ -140,7 +177,7 @@ export default function ProgramJadwal() {
       name: 'Pengolahan Makanan Sehat',
       durasi: '2 Bulan',
       jadwal: 'Senin - Jumat, 08:00 - 14:00',
-      kuota: 15, terisi: 6,
+      kuota: 15, terisi: 6, kuotaPelatihan: 12,
       kategori: 'kuliner',
       difficulty: 'Pemula',
       jobProspect: 'Tinggi',
@@ -153,7 +190,7 @@ export default function ProgramJadwal() {
       name: 'Digital Marketing',
       durasi: '2 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 15:00',
-      kuota: 25, terisi: 22,
+      kuota: 25, terisi: 22, kuotaPelatihan: 20,
       kategori: 'teknologi',
       difficulty: 'Pemula',
       jobProspect: 'Sangat Tinggi',
@@ -166,7 +203,7 @@ export default function ProgramJadwal() {
       name: 'Data Analysis',
       durasi: '3 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 16:00',
-      kuota: 20, terisi: 9,
+      kuota: 20, terisi: 9, kuotaPelatihan: 16,
       kategori: 'teknologi',
       difficulty: 'Menengah',
       jobProspect: 'Sangat Tinggi',
@@ -179,7 +216,7 @@ export default function ProgramJadwal() {
       name: 'Web Development',
       durasi: '3 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 16:00',
-      kuota: 20, terisi: 7,
+      kuota: 20, terisi: 7, kuotaPelatihan: 16,
       kategori: 'teknologi',
       difficulty: 'Menengah',
       jobProspect: 'Tinggi',
@@ -192,7 +229,7 @@ export default function ProgramJadwal() {
       name: 'Desain UI/UX',
       durasi: '2 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 15:00',
-      kuota: 20, terisi: 16,
+      kuota: 20, terisi: 16, kuotaPelatihan: 16,
       kategori: 'teknologi',
       difficulty: 'Pemula',
       jobProspect: 'Tinggi',
@@ -205,7 +242,7 @@ export default function ProgramJadwal() {
       name: 'Desain Grafis',
       durasi: '2 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 16:00',
-      kuota: 25, terisi: 20,
+      kuota: 25, terisi: 20, kuotaPelatihan: 20,
       kategori: 'kreatif',
       difficulty: 'Pemula',
       jobProspect: 'Tinggi',
@@ -218,7 +255,7 @@ export default function ProgramJadwal() {
       name: 'Fotografi & Videografi',
       durasi: '2 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 15:00',
-      kuota: 15, terisi: 5,
+      kuota: 15, terisi: 5, kuotaPelatihan: 12,
       kategori: 'kreatif',
       difficulty: 'Pemula',
       jobProspect: 'Tinggi',
@@ -231,7 +268,7 @@ export default function ProgramJadwal() {
       name: 'Animasi Digital',
       durasi: '3 Bulan',
       jadwal: 'Senin - Jumat, 09:00 - 16:00',
-      kuota: 15, terisi: 11,
+      kuota: 15, terisi: 11, kuotaPelatihan: 12,
       kategori: 'kreatif',
       difficulty: 'Menengah',
       jobProspect: 'Tinggi',
@@ -243,7 +280,7 @@ export default function ProgramJadwal() {
     {
       name: 'Bahasa Inggris',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 14:00',
-      kuota: 25, terisi: 10, kategori: 'bahasa', difficulty: 'Pemula', jobProspect: 'Sangat Tinggi',
+      kuota: 25, terisi: 10, kuotaPelatihan: 20, kategori: 'bahasa', difficulty: 'Pemula', jobProspect: 'Sangat Tinggi',
       deskripsi: 'Pelatihan Bahasa Inggris komunikatif yang mencakup speaking, listening, reading, dan writing untuk kebutuhan dunia kerja dan sehari-hari.',
       modul: ['Tata bahasa dasar (grammar)', 'Percakapan sehari-hari & dunia kerja', 'Listening & pronunciation', 'Reading & writing skills', 'Simulasi wawancara kerja berbahasa Inggris'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani'],
@@ -252,7 +289,7 @@ export default function ProgramJadwal() {
     {
       name: 'Bahasa Jepang',
       durasi: '3 Bulan', jadwal: 'Senin - Jumat, 08:00 - 14:00',
-      kuota: 20, terisi: 8, kategori: 'bahasa', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 8, kuotaPelatihan: 16, kategori: 'bahasa', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan Bahasa Jepang tingkat dasar hingga menengah mencakup hiragana, katakana, kosakata, dan percakapan untuk persiapan kerja di perusahaan Jepang.',
       modul: ['Huruf Hiragana & Katakana', 'Kosakata & kalimat dasar', 'Percakapan sehari-hari (Nihongo)', 'Budaya kerja Jepang', 'Simulasi ujian JLPT N5'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMA/sederajat', 'Sehat jasmani dan rohani'],
@@ -261,7 +298,7 @@ export default function ProgramJadwal() {
     {
       name: 'Petugas Keamanan',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 07:00 - 14:00',
-      kuota: 30, terisi: 20, kategori: 'keamanan', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 30, terisi: 20, kuotaPelatihan: 25, kategori: 'keamanan', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan petugas keamanan profesional yang mencakup teknik pengamanan, prosedur darurat, dan etika profesi untuk bekerja di gedung, mall, atau kawasan industri.',
       modul: ['Dasar-dasar keamanan & hukum', 'Teknik patroli & pengamanan aset', 'Pertolongan pertama (P3K)', 'Penanganan situasi darurat', 'Etika & komunikasi profesional'],
       syarat: ['Usia 18–35 tahun', 'Pendidikan minimal SMA/sederajat', 'Tinggi badan minimal 165 cm (pria)', 'Sehat jasmani dan rohani', 'Tidak memiliki catatan kriminal'],
@@ -270,7 +307,7 @@ export default function ProgramJadwal() {
     {
       name: 'Las Plat',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 07:00 - 15:00',
-      kuota: 20, terisi: 14, kategori: 'teknik', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 14, kuotaPelatihan: 16, kategori: 'teknik', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan pengelasan plat logam menggunakan mesin las SMAW dan MIG untuk fabrikasi rangka, bodi kendaraan, dan konstruksi baja ringan.',
       modul: ['Keselamatan kerja & APD las', 'Pengenalan peralatan & mesin las', 'Teknik las SMAW dasar', 'Teknik las MIG/MAG', 'Pemeriksaan kualitas sambungan las'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Tidak buta warna'],
@@ -279,7 +316,7 @@ export default function ProgramJadwal() {
     {
       name: 'Las Pipa',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 07:00 - 15:00',
-      kuota: 15, terisi: 9, kategori: 'teknik', difficulty: 'Menengah', jobProspect: 'Sangat Tinggi',
+      kuota: 15, terisi: 9, kuotaPelatihan: 12, kategori: 'teknik', difficulty: 'Menengah', jobProspect: 'Sangat Tinggi',
       deskripsi: 'Pelatihan pengelasan pipa untuk instalasi minyak, gas, dan air menggunakan teknik GTAW dan SMAW posisi 1G hingga 6G sesuai standar industri.',
       modul: ['K3 pengelasan pipa & gas berbahaya', 'Teknik las pipa posisi 1G & 2G', 'Teknik las pipa posisi 5G & 6G', 'Inspeksi visual & uji NDT dasar', 'Standar kualifikasi welder AWS/ASME'],
       syarat: ['Usia minimal 18 tahun', 'Pendidikan minimal SMP/sederajat', 'Pengalaman las dasar diutamakan', 'Sehat jasmani dan rohani'],
@@ -288,7 +325,7 @@ export default function ProgramJadwal() {
     {
       name: 'Sistem Injeksi',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 12, kategori: 'teknik', difficulty: 'Menengah', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 12, kuotaPelatihan: 16, kategori: 'teknik', difficulty: 'Menengah', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan diagnosis dan perbaikan sistem bahan bakar injeksi (EFI) pada kendaraan modern menggunakan scan tool dan alat ukur elektronik.',
       modul: ['Dasar elektronika otomotif', 'Cara kerja sistem EFI', 'Penggunaan scanner & multimeter', 'Diagnosis kerusakan sensor & aktuator', 'Kalibrasi & reset ECU'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Pengetahuan dasar otomotif diutamakan', 'Sehat jasmani dan rohani'],
@@ -297,7 +334,7 @@ export default function ProgramJadwal() {
     {
       name: 'Service Sepeda Motor',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 25, terisi: 18, kategori: 'teknik', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 25, terisi: 18, kuotaPelatihan: 20, kategori: 'teknik', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan teknik perawatan dan perbaikan sepeda motor konvensional maupun injeksi, termasuk tune-up, rem, transmisi, dan kelistrikan.',
       modul: ['Komponen & cara kerja mesin motor', 'Tune-up & perawatan berkala', 'Sistem rem & suspensi', 'Sistem kelistrikan & baterai', 'Service injeksi & karburator'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani'],
@@ -306,7 +343,7 @@ export default function ProgramJadwal() {
     {
       name: 'Mechanical Electrical',
       durasi: '3 Bulan', jadwal: 'Senin - Jumat, 07:00 - 15:00',
-      kuota: 20, terisi: 7, kategori: 'teknik', difficulty: 'Menengah', jobProspect: 'Sangat Tinggi',
+      kuota: 20, terisi: 7, kuotaPelatihan: 16, kategori: 'teknik', difficulty: 'Menengah', jobProspect: 'Sangat Tinggi',
       deskripsi: 'Pelatihan teknik mekanikal dan elektrikal untuk instalasi, perawatan, dan perbaikan sistem listrik industri dan gedung, meliputi panel listrik, motor listrik, dan PLC.',
       modul: ['Kelistrikan dasar & K3 listrik', 'Instalasi panel listrik 3 fase', 'Motor listrik & sistem kontrol', 'Pengantar PLC (Programmable Logic Controller)', 'Perawatan & troubleshooting mekanikal'],
       syarat: ['Usia minimal 18 tahun', 'Pendidikan minimal SMA/sederajat (IPA/Teknik diutamakan)', 'Sehat jasmani dan rohani', 'Tidak buta warna'],
@@ -315,7 +352,7 @@ export default function ProgramJadwal() {
     {
       name: 'Housekeeping',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 11, kategori: 'hospitality', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 11, kuotaPelatihan: 16, kategori: 'hospitality', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan tata graha (housekeeping) hotel yang mencakup pembersihan kamar, laundry, turndown service, dan standar kebersihan internasional.',
       modul: ['Pengenalan industri perhotelan', 'Teknik membersihkan & merapikan kamar', 'Penanganan linen & laundry', 'Penggunaan bahan kimia pembersih yang aman', 'Standar layanan & komunikasi tamu'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Berpenampilan rapi & bersih'],
@@ -324,7 +361,7 @@ export default function ProgramJadwal() {
     {
       name: 'Food and Beverage Service',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 9, kategori: 'hospitality', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 9, kuotaPelatihan: 16, kategori: 'hospitality', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan pelayanan makanan dan minuman (F&B Service) di restoran dan hotel bintang, mencakup table manner, teknik serving, dan standar layanan internasional.',
       modul: ['Pengenalan F&B service & etika profesi', 'Table set-up & napkin folding', 'Teknik serving makanan & minuman', 'Penanganan keluhan tamu', 'Pengantar wine & beverage service'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Berpenampilan rapi & komunikatif'],
@@ -333,7 +370,7 @@ export default function ProgramJadwal() {
     {
       name: 'Perawatan Kecantikan',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 16, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 16, kuotaPelatihan: 16, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan perawatan kecantikan kulit wajah dan tubuh yang mencakup facial, perawatan kulit, dan penanganan masalah kulit menggunakan produk dan alat profesional.',
       modul: ['Anatomi kulit & jenis-jenis kulit', 'Teknik facial & cleansing', 'Perawatan kulit bermasalah (jerawat, flek)', 'Body treatment & scrub', 'Higiene & sterilisasi alat kecantikan'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Tidak alergi produk kecantikan'],
@@ -342,7 +379,7 @@ export default function ProgramJadwal() {
     {
       name: 'Make Up Artist',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 09:00 - 15:00',
-      kuota: 20, terisi: 18, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 18, kuotaPelatihan: 15, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan tata rias wajah profesional untuk berbagai kesempatan — pernikahan, wisuda, fashion, dan event — menggunakan teknik dan produk makeup terkini.',
       modul: ['Dasar makeup & teori warna', 'Teknik koreksi wajah (contouring & highlighting)', 'Makeup pengantin tradisional & modern', 'Makeup editorial & fashion', 'Teknik airbrush makeup'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Tidak buta warna'],
@@ -351,7 +388,7 @@ export default function ProgramJadwal() {
     {
       name: 'Terapis Spa',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 15, terisi: 10, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 15, terisi: 10, kuotaPelatihan: 12, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan terapis spa profesional mencakup berbagai teknik pijat relaksasi, body treatment, dan aromaterapi untuk bekerja di spa hotel, klinik kecantikan, atau membuka usaha sendiri.',
       modul: ['Anatomi tubuh & titik pijat', 'Teknik Swedish massage', 'Teknik pijat relaksasi & refleksi', 'Body scrub & wrap treatment', 'Aromaterapi & penggunaan essential oil'],
       syarat: ['Usia minimal 18 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Tidak memiliki gangguan muskuloskeletal'],
@@ -360,7 +397,7 @@ export default function ProgramJadwal() {
     {
       name: 'Perias Rambut',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 14, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 14, kuotaPelatihan: 16, kategori: 'kecantikan', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan tata rambut profesional mencakup teknik potong, pewarnaan, pelurusan, pengeritingan, dan perawatan rambut sesuai standar salon profesional.',
       modul: ['Pengenalan jenis rambut & kulit kepala', 'Teknik potong dasar & lanjutan', 'Teknik pewarnaan (coloring & highlighting)', 'Pelurusan & pengeritingan kimia', 'Perawatan rambut & scalp treatment'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Tidak alergi bahan kimia rambut'],
@@ -369,7 +406,7 @@ export default function ProgramJadwal() {
     {
       name: 'Administrasi Perkantoran',
       durasi: '2 Bulan', jadwal: 'Senin - Jumat, 09:00 - 15:00',
-      kuota: 25, terisi: 13, kategori: 'bisnis', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 25, terisi: 13, kuotaPelatihan: 20, kategori: 'bisnis', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan administrasi perkantoran modern yang mencakup penggunaan Microsoft Office, manajemen arsip, korespondensi bisnis, dan pelayanan prima untuk siap bekerja di kantor.',
       modul: ['Microsoft Word, Excel & PowerPoint lanjutan', 'Manajemen surat & arsip (filing system)', 'Korespondensi bisnis & email resmi', 'Pelayanan prima & etika kantor', 'Penggunaan alat kantor & sistem digital'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMA/sederajat', 'Kemampuan dasar komputer', 'Sehat jasmani dan rohani'],
@@ -378,7 +415,7 @@ export default function ProgramJadwal() {
     {
       name: 'Penjahit Busana',
       durasi: '3 Bulan', jadwal: 'Senin - Jumat, 08:00 - 15:00',
-      kuota: 20, terisi: 12, kategori: 'fashion', difficulty: 'Pemula', jobProspect: 'Tinggi',
+      kuota: 20, terisi: 12, kuotaPelatihan: 16, kategori: 'fashion', difficulty: 'Pemula', jobProspect: 'Tinggi',
       deskripsi: 'Pelatihan menjahit busana wanita dan pria dari dasar hingga mampu membuat pakaian ready-to-wear. Mencakup pengukuran, pembuatan pola, pemotongan, dan jahit finishing.',
       modul: ['Pengenalan mesin jahit & alat', 'Pengambilan ukuran & pembuatan pola dasar', 'Teknik memotong bahan', 'Menjahit busana wanita (blus, rok, gaun)', 'Finishing & quality control'],
       syarat: ['Usia minimal 17 tahun', 'Pendidikan minimal SMP/sederajat', 'Sehat jasmani dan rohani', 'Ketekunan & ketelitian tinggi'],
@@ -393,6 +430,21 @@ export default function ProgramJadwal() {
         p.durasi.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : programs;
+
+  const typoSuggestion = (() => {
+    if (!searchQuery.trim() || filteredPrograms.length > 0) return null;
+    const q = searchQuery.trim().toLowerCase();
+    let best: { name: string; dist: number } | null = null;
+    for (const p of programs) {
+      const dist = levenshtein(q, p.name.toLowerCase());
+      // Also check if q is a substring of the name with small distance
+      const threshold = Math.max(2, Math.floor(q.length * 0.4));
+      if (!best || dist < best.dist) best = { name: p.name, dist };
+    }
+    return best && best.dist <= Math.max(3, Math.floor(searchQuery.trim().length * 0.5))
+      ? best.name
+      : null;
+  })();
 
   // Calendar state
   const today = new Date();
@@ -487,29 +539,148 @@ export default function ProgramJadwal() {
                 <h2 className="text-2xl font-bold text-gray-900">Semua Program Pelatihan</h2>
                 <p className="text-gray-600 text-sm mt-1">Seret ikon tangan ke favorit untuk menyimpan program favoritmu</p>
               </div>
-              <div className="relative sm:ml-auto w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <div ref={searchContainerRef} className="relative sm:ml-auto w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={e => { setSearchQuery(e.target.value); setShowSuggestions(true); }}
+                  onFocus={() => setShowSuggestions(true)}
                   placeholder="Cari program pelatihan..."
                   className="w-full pl-9 pr-9 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                  autoComplete="off"
                 />
                 {searchQuery && (
                   <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => { setSearchQuery(''); setShowSuggestions(false); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 )}
+
+                {/* Suggestions dropdown */}
+                {showSuggestions && (() => {
+                  const q = searchQuery.trim().toLowerCase();
+
+                  // Category labels mapping
+                  const catLabels: Record<string, string> = {
+                    kuliner: 'Kuliner & F&B',
+                    teknologi: 'Teknologi & Digital',
+                    kreatif: 'Kreatif & Desain',
+                    bahasa: 'Bahasa',
+                    keamanan: 'Keamanan',
+                    teknik: 'Teknik & Mekanik',
+                    hospitality: 'Hospitality',
+                    kecantikan: 'Kecantikan',
+                    bisnis: 'Bisnis & Administrasi',
+                    fashion: 'Fashion',
+                  };
+
+                  const popularSearches = ['Barista', 'Digital Marketing', 'Desain Grafis', 'Las Plat', 'Make Up Artist'];
+
+                  // When empty: show popular searches
+                  if (!q) {
+                    return (
+                      <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                        <div className="px-3 py-2 border-b border-gray-100">
+                          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Pencarian Populer</span>
+                        </div>
+                        {popularSearches.map(name => (
+                          <button
+                            key={name}
+                            onMouseDown={e => { e.preventDefault(); setSearchQuery(name); setShowSuggestions(false); }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+                          >
+                            <Search className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                            {name}
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  // Match program names
+                  const matchedPrograms = programs.filter(p => p.name.toLowerCase().includes(q)).slice(0, 6);
+                  // Match category keys or labels
+                  const matchedCats = Object.entries(catLabels).filter(([key, label]) =>
+                    key.includes(q) || label.toLowerCase().includes(q)
+                  );
+
+                  if (matchedPrograms.length === 0 && matchedCats.length === 0) return null;
+
+                  return (
+                    <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                      {matchedCats.length > 0 && (
+                        <>
+                          <div className="px-3 py-2 border-b border-gray-100">
+                            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Kategori</span>
+                          </div>
+                          {matchedCats.map(([key, label]) => (
+                            <button
+                              key={key}
+                              onMouseDown={e => { e.preventDefault(); setSearchQuery(label); setShowSuggestions(false); }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+                            >
+                              <span className="w-3.5 h-3.5 flex-shrink-0 rounded-sm bg-blue-100 inline-block" />
+                              {label}
+                            </button>
+                          ))}
+                        </>
+                      )}
+                      {matchedPrograms.length > 0 && (
+                        <>
+                          <div className={`px-3 py-2 ${matchedCats.length > 0 ? 'border-t' : ''} border-gray-100`}>
+                            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Program</span>
+                          </div>
+                          {matchedPrograms.map(p => (
+                            <button
+                              key={p.name}
+                              onMouseDown={e => { e.preventDefault(); setSearchQuery(p.name); setShowSuggestions(false); }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+                            >
+                              <Search className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                              <span>
+                                {p.name.toLowerCase().indexOf(q) >= 0 ? (
+                                  <>
+                                    {p.name.slice(0, p.name.toLowerCase().indexOf(q))}
+                                    <span className="font-semibold text-blue-600">{p.name.slice(p.name.toLowerCase().indexOf(q), p.name.toLowerCase().indexOf(q) + q.length)}</span>
+                                    {p.name.slice(p.name.toLowerCase().indexOf(q) + q.length)}
+                                  </>
+                                ) : p.name}
+                              </span>
+                              <span className="ml-auto text-[10px] text-gray-400 capitalize flex-shrink-0">{p.kategori}</span>
+                            </button>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
             {searchQuery && (
-              <p className="text-sm text-gray-500 mt-1">
-                Menampilkan <span className="font-semibold text-blue-600">{filteredPrograms.length}</span> hasil untuk "{searchQuery}"
-              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-0.5">
+                  <Search className="w-3 h-3" />
+                  Mencari di Semua Program Pelatihan
+                </span>
+                <p className="text-sm text-gray-500">
+                  Menampilkan <span className="font-semibold text-blue-600">{filteredPrograms.length}</span> hasil untuk "{searchQuery}"
+                </p>
+                {typoSuggestion && (
+                  <p className="text-sm text-gray-500">
+                    — Mungkin maksud Anda{' '}
+                    <button
+                      onClick={() => setSearchQuery(typoSuggestion)}
+                      className="font-semibold text-blue-600 hover:underline"
+                    >
+                      {typoSuggestion}
+                    </button>
+                    ?
+                  </p>
+                )}
+              </div>
             )}
           </div>
 
@@ -517,7 +688,7 @@ export default function ProgramJadwal() {
             {filteredPrograms.length === 0 ? (
               <div className="col-span-full py-16 text-center text-gray-400">
                 <Search className="w-10 h-10 mx-auto mb-3 text-gray-200" />
-                <p className="text-sm">Tidak ada program yang cocok dengan pencarian "<span className="font-medium">{searchQuery}</span>"</p>
+                <p className="text-sm">Tidak ada program yang cocok dengan "<span className="font-medium text-gray-600">{searchQuery}</span>"</p>
               </div>
             ) : null}
             {(searchQuery ? filteredPrograms : showAll ? filteredPrograms : filteredPrograms.slice(0, 8)).map((program, index) => {
@@ -551,33 +722,38 @@ export default function ProgramJadwal() {
                       <Clock className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                       <span className="text-xs leading-snug">{program.jadwal}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Users className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <span className="text-xs">Kuota: {program.kuota} peserta</span>
-                    </div>
                   </div>
 
-                  {/* Indikator Kuota Ekspresif */}
+                  {/* Kuota Pendaftar + Kuota Pelatihan */}
                   {(() => {
                     const sisa = program.kuota - program.terisi;
                     const pct = Math.round((sisa / program.kuota) * 100);
                     const kritis = pct <= 20;
                     const sedang = pct > 20 && pct <= 50;
                     const barColor = kritis ? 'bg-red-500' : sedang ? 'bg-yellow-400' : 'bg-green-500';
-                    const label = kritis ? `Sisa ${sisa} tempat!` : sedang ? `Sisa ${sisa} tempat` : `${sisa} tempat tersedia`;
+                    const label = kritis ? `Sisa ${sisa}!` : sedang ? `Sisa ${sisa}` : `${sisa} tersedia`;
                     return (
-                      <div className="mt-3">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className={`text-xs font-semibold ${kritis ? 'text-red-600 animate-pulse' : sedang ? 'text-yellow-600' : 'text-green-600'}`}>
-                            {label}
-                          </span>
-                          <span className="text-xs text-gray-400">{program.terisi}/{program.kuota}</span>
+                      <div className="mt-3 space-y-2">
+                        {/* Kuota Pendaftar with bar */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs font-semibold text-gray-700">Kuota Pendaftar</span>
+                            <span className={`text-xs font-semibold ${kritis ? 'text-red-600 animate-pulse' : sedang ? 'text-yellow-600' : 'text-green-600'}`}>
+                              {label}
+                            </span>
+                          </div>
+                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${barColor} ${kritis ? 'animate-pulse' : ''}`}
+                              style={{ width: `${(program.terisi / program.kuota) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-400">{program.terisi}/{program.kuota} peserta</span>
                         </div>
-                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${barColor} ${kritis ? 'animate-pulse' : ''}`}
-                            style={{ width: `${(program.terisi / program.kuota) * 100}%` }}
-                          />
+                        {/* Kuota Pelatihan text only */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-gray-700">Kuota Pelatihan</span>
+                          <span className="text-xs text-gray-600">{program.kuotaPelatihan} peserta</span>
                         </div>
                       </div>
                     );
@@ -999,7 +1175,7 @@ export default function ProgramJadwal() {
                 + Simpan ke Favorit
               </button>
               <button
-                onClick={() => navigate('/register')}
+                onClick={() => { setSelectedProgram(null); handleDaftar(); }}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-medium transition-colors"
               >
                 Daftar Sekarang
@@ -1044,7 +1220,7 @@ export default function ProgramJadwal() {
               )}
               {savedPrograms.length > 0 && (
                 <button
-                  onClick={() => navigate('/register')}
+                  onClick={handleDaftar}
                   className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Daftar Sekarang

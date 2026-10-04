@@ -15,15 +15,19 @@ export default function Login() {
     e.preventDefault();
     setLoginError('');
 
-    // Cari data dari registered users
+    // Cari data dari registered users (termasuk phone & address yang disimpan saat registrasi)
     let userData = null;
     try {
       const saved = localStorage.getItem('ppkd_registered_users');
-      const users = saved ? JSON.parse(saved) : [];
-      userData = users.find((u: { email: string }) => u.email.toLowerCase() === email.toLowerCase());
+      const users: Array<{ email: string; fullName: string; phone?: string; address?: string }> =
+        saved ? JSON.parse(saved) : [];
+      const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (found) {
+        userData = found;
+      }
     } catch {}
 
-    // Jika tidak ditemukan, buat dari email (login tanpa register)
+    // Jika tidak ditemukan, buat dari email (untuk akun lama / demo)
     if (!userData) {
       const namePart = email.split('@')[0];
       userData = {
